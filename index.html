@@ -371,6 +371,14 @@ tailwind.config = {
   html.light .proj-item:hover { background: rgba(0,0,0,0.03); border-color: #e5e7eb; }
   html.light .proj-item.proj-active { background: rgba(249,115,22,0.06); border-color: rgba(249,115,22,0.25); }
 
+  /* Light header more-menu */
+  html.light #hdr-more-btn { border-color: #d6d3d1; color: #78716c; }
+  html.light #hdr-more-btn:hover { border-color: #a8a29e; color: #1c1917; }
+  html.light #hdr-more-menu { background: #ffffff; border-color: #e5e7eb; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  html.light #hdr-more-menu button { color: #44403c; }
+  html.light #hdr-more-menu button:hover { background: #f5f5f4; }
+  html.light #hdr-more-menu .bg-zinc-800 { background: #e7e5e4 !important; }
+
   /* Light search fab */
   html.light #search-fab-btn { background: #ffffff; border-color: #e5e7eb; color: #6b7280; }
   html.light #search-fab-btn:hover { border-color: #d1d5db; color: #374151; }
@@ -533,12 +541,31 @@ tailwind.config = {
 
     /* Modal */
     #modal > div { width: calc(100vw - 32px) !important; }
+
+    /* Header: gom các nút phụ vào menu "⋯" */
+    .hdr-secondary { display: none !important; }
+    .hdr-more-btn { display: flex !important; }
+    #hdr-more-menu { display: none; }
+    #hdr-more-menu.open { display: flex; }
+    .hdr-actions { gap: 6px !important; }
+
+    /* Toolbar: ẩn các nút thêm (đã có ở nút FAB tròn) — chỉ giữ "Dự án" */
+    .tb-add { display: none !important; }
+
+    /* Card đầu mục: gọn hơn, tăng khoảng thở */
+    #mobile-view { padding-top: 8px; }
+    .mob-card-head { padding: 9px 12px 7px; gap: 7px; }
+    .mob-card-head .mob-del,
+    .mob-card-head button { padding: 3px; }
+    .mob-thoai-main { font-size: 15px !important; }
   }
 
   @media (min-width: 640px) {
     #fab { display: none !important; }
     .hdr-status-group { display: flex; }
     #mobile-view { display: none !important; }
+    /* Menu "⋯" chỉ dành cho mobile */
+    .hdr-more-btn, #hdr-more-menu { display: none !important; }
   }
   /* ===== END MOBILE ===== */
 
@@ -650,7 +677,7 @@ tailwind.config = {
 
       <!-- Theme Toggle -->
       <button onclick="toggleTheme()" id="theme-btn" title="Đổi giao diện"
-        class="btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
+        class="hdr-secondary btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
         <svg id="icon-sun" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
         </svg>
@@ -660,24 +687,54 @@ tailwind.config = {
       </button>
 
       <!-- Teleprompter / Chế độ quay -->
-      <button onclick="openPrompter()" title="Chế độ quay (Teleprompter)" class="btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-cyan-400 border border-zinc-800 hover:border-cyan-700 rounded-lg transition-all">
+      <button onclick="openPrompter()" title="Chế độ quay (Teleprompter)" class="hdr-secondary btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-cyan-400 border border-zinc-800 hover:border-cyan-700 rounded-lg transition-all">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
       </button>
 
       <!-- Lock / PIN -->
-      <button onclick="managePin()" id="lock-btn" title="Đặt mã PIN để khoá" class="btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
+      <button onclick="managePin()" id="lock-btn" title="Đặt mã PIN để khoá" class="hdr-secondary btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
       </button>
 
       <!-- PDF -->
-      <button onclick="printPDF()" title="Xuất PDF (gọn, xem trên điện thoại)" class="btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-rose-400 border border-zinc-800 hover:border-rose-700 rounded-lg transition-all">
+      <button onclick="printPDF()" title="Xuất PDF (gọn, xem trên điện thoại)" class="hdr-secondary btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-rose-400 border border-zinc-800 hover:border-rose-700 rounded-lg transition-all">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
       </button>
 
       <!-- CSV -->
-      <button onclick="exportCSV()" title="Xuất CSV" class="btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
+      <button onclick="exportCSV()" title="Xuất CSV" class="hdr-secondary btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
       </button>
+
+      <!-- More menu (mobile only) -->
+      <div class="hdr-more-wrap relative">
+        <button onclick="hdrMoreToggle(event)" id="hdr-more-btn" title="Thêm" class="hdr-more-btn btn-press w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+        </button>
+        <div id="hdr-more-menu" class="absolute right-0 top-10 w-44 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-1.5 flex-col gap-0.5 z-50">
+          <button onclick="toggleTheme();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            Đổi giao diện
+          </button>
+          <button onclick="openPrompter();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Chế độ quay
+          </button>
+          <button onclick="managePin();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            Mã PIN khoá
+          </button>
+          <div class="h-px bg-zinc-800 my-1"></div>
+          <button onclick="printPDF();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Xuất PDF
+          </button>
+          <button onclick="exportCSV();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Xuất CSV
+          </button>
+        </div>
+      </div>
 
       <!-- Save status -->
       <span id="save-status" class="flex items-center gap-1.5 text-[11px] text-zinc-500 mr-0.5 whitespace-nowrap" title="Trạng thái lưu">
@@ -706,22 +763,22 @@ tailwind.config = {
       Dự án
     </button>
 
-    <button onclick="addRow()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 rounded-lg transition-all">
+    <button onclick="addRow()" class="tb-add btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
       Thêm cảnh
     </button>
 
-    <button onclick="addSubRow()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all">
+    <button onclick="addSubRow()" class="tb-add btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h11M9 6l4 4-4 4"/></svg>
       Dòng phụ
     </button>
 
-    <button onclick="promptSection()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-orange-500 hover:text-orange-300 border border-orange-900/40 hover:border-orange-800 rounded-lg transition-all">
+    <button onclick="promptSection()" class="tb-add btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-orange-500 hover:text-orange-300 border border-orange-900/40 hover:border-orange-800 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
       Danh mục
     </button>
 
-    <button onclick="openTplModal()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-900/40 hover:border-cyan-800 rounded-lg transition-all">
+    <button onclick="openTplModal()" class="tb-add btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-900/40 hover:border-cyan-800 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-4H5m14 8H5m4 4h6"/></svg>
       Mẫu
     </button>
@@ -1206,6 +1263,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('click', e => {
     const fab = document.getElementById('search-fab');
     if (fab && !fab.contains(e.target)) closeSearch();
+    const more = document.querySelector('.hdr-more-wrap');
+    if (more && !more.contains(e.target)) hdrMoreClose();
   });
 });
 
@@ -1864,6 +1923,15 @@ function fabClose() {
   document.getElementById('fab-menu').classList.remove('flex');
   document.getElementById('fab-plus').classList.remove('hidden');
   document.getElementById('fab-x').classList.add('hidden');
+}
+
+// Menu "⋯" trên header (mobile)
+function hdrMoreToggle(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('hdr-more-menu').classList.toggle('open');
+}
+function hdrMoreClose() {
+  document.getElementById('hdr-more-menu').classList.remove('open');
 }
 
 // ============================================================
