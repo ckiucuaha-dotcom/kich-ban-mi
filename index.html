@@ -350,6 +350,19 @@ tailwind.config = {
     color: #78716c;
   }
 
+  /* AI modal */
+  .ai-bar-track { height: 6px; border-radius: 999px; background: #27272a; overflow: hidden; }
+  html.light .ai-bar-track { background: #e7e5e4; }
+  .ai-block { border: 1px solid #27272a; border-radius: 12px; padding: 12px; background: #18181b; }
+  html.light .ai-block { background: #fafaf9; border-color: #e7e5e4; }
+  html.light #ai-modal > div { background: #ffffff; border-color: #e7e5e4; }
+  html.light #ai-modal h3 { color: #1c1917; }
+  html.light #ai-modal p { color: #78716c; }
+  html.light #ai-key-input { background: #f5f5f4; border-color: #d6d3d1; color: #1c1917; }
+  html.light #ai-modal .text-zinc-100, html.light #ai-modal .text-zinc-200 { color: #1c1917 !important; }
+  html.light #ai-modal .text-zinc-400 { color: #57534e !important; }
+  html.light #ai-modal .text-zinc-500 { color: #78716c !important; }
+
   /* Toast light */
   html.light #toast-inner {
     background: #ffffff;
@@ -724,6 +737,10 @@ tailwind.config = {
             <svg class="w-4 h-4 flex-shrink-0 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
             Mã PIN khoá
           </button>
+          <button onclick="openAiModal();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
+            Chấm điểm AI
+          </button>
           <div class="h-px bg-zinc-800 my-1"></div>
           <button onclick="printPDF();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
             <svg class="w-4 h-4 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -781,6 +798,11 @@ tailwind.config = {
     <button onclick="openTplModal()" class="tb-add btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-900/40 hover:border-cyan-800 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-4H5m14 8H5m4 4h6"/></svg>
       Mẫu
+    </button>
+
+    <button onclick="openAiModal()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-900/50 hover:border-violet-700 rounded-lg transition-all">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
+      Chấm AI
     </button>
 
     <!-- Right side -->
@@ -1038,6 +1060,57 @@ tailwind.config = {
   </div>
 </div>
 
+<!-- ===== AI SCORING MODAL ===== -->
+<div id="ai-modal" class="modal-overlay hidden">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-[34rem] max-w-[calc(100vw-32px)] max-h-[90vh] overflow-y-auto shadow-2xl slide-in">
+    <div class="flex items-center gap-2 mb-1">
+      <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
+      <h3 class="text-sm font-semibold text-zinc-100">Chấm điểm AI</h3>
+      <span id="ai-proj-name" class="text-xs text-zinc-500 truncate"></span>
+      <button onclick="closeAiModal()" class="ml-auto btn-press w-7 h-7 flex items-center justify-center text-zinc-600 hover:text-zinc-300 rounded-lg transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-xs text-zinc-500 mb-4">AI chấm kịch bản theo phong cách @tracuami: hook · arc · giọng Huế · giác quan · con số · CTA.</p>
+
+    <!-- Key setup (shown when no key) -->
+    <div id="ai-key-setup" class="hidden">
+      <label class="block text-xs font-semibold text-zinc-400 mb-1.5">API key Gemini (miễn phí)</label>
+      <input type="password" id="ai-key-input" placeholder="Dán API key Gemini vào đây..."
+        class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-violet-600 mb-2">
+      <p class="text-[11px] text-zinc-600 mb-3">
+        Lấy key miễn phí tại
+        <a href="https://aistudio.google.com/apikey" target="_blank" class="text-violet-400 hover:text-violet-300 underline">aistudio.google.com/apikey</a>.
+        Key lưu trong trình duyệt này — chỉ dùng trên thiết bị riêng của bạn.
+      </p>
+      <button onclick="saveGeminiKey()" class="w-full px-4 py-2.5 text-sm bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-all">Lưu key</button>
+    </div>
+
+    <!-- Ready state (key present) -->
+    <div id="ai-ready" class="hidden">
+      <button onclick="runAiScore()" id="ai-run-btn" class="btn-press w-full px-4 py-3 text-sm bg-violet-600 hover:bg-violet-500 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
+        Chấm điểm kịch bản này
+      </button>
+      <div class="text-center mt-2">
+        <button onclick="changeGeminiKey()" class="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">Đổi API key</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="ai-loading" class="hidden flex-col items-center justify-center py-10 gap-3">
+      <div class="w-7 h-7 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-zinc-400 text-sm">AI đang đọc &amp; chấm kịch bản...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="ai-error" class="hidden mt-3 p-3 rounded-xl border border-red-900/50 bg-red-950/30 text-sm text-red-300"></div>
+
+    <!-- Result -->
+    <div id="ai-result" class="hidden mt-4"></div>
+  </div>
+</div>
+
 <!-- ===== LOADING OVERLAY ===== -->
 <div id="loading-overlay" class="fixed inset-0 z-[500] bg-zinc-950/90 flex flex-col items-center justify-center gap-4 hidden">
   <div class="w-8 h-8 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
@@ -1243,6 +1316,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('schedule-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('schedule-modal')) closeScheduleModal();
+  });
+  document.getElementById('ai-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('ai-modal')) closeAiModal();
   });
 
   document.addEventListener('keydown', e => {
@@ -1932,6 +2008,191 @@ function hdrMoreToggle(e) {
 }
 function hdrMoreClose() {
   document.getElementById('hdr-more-menu').classList.remove('open');
+}
+
+// ============================================================
+// CHẤM ĐIỂM AI (Gemini) — gọi REST trực tiếp từ trình duyệt
+// ============================================================
+const GEMINI_MODEL = 'gemini-2.5-flash'; // free tier; nếu lỗi 404 đổi 'gemini-2.0-flash'
+const GEMINI_KEY_LS = 'gemini-api-key';
+
+const SCORING_RUBRIC = `Bạn là biên kịch TikTok kỳ cựu của kênh ẩm thực Huế "@tracuami" (thương hiệu tré trộn / trà trái cây, nhân vật "Nhớ"). Hãy chấm điểm kịch bản video TikTok theo ĐÚNG bộ nguyên tắc của kênh. Nhận xét bằng tiếng Việt, ngắn gọn, cụ thể, thẳng thắn (chỉ ra ví dụ trong kịch bản).
+
+Chấm theo 8 tiêu chí (mỗi tiêu chí 0–10):
+1. "Hook" — 3 từ đầu phải làm người xem DỪNG SCROLL. Test: chỉ thấy 3 từ đầu có tò mò xem tiếp không? Hook cụt/nhạt thì điểm thấp.
+2. "Arc & nhịp" — phải theo nhịp Hook → thư giãn nhỏ → leo thang → vỡ òa → CTA. PHẠT NẶNG nếu "đi ngang" (giải thích/tả sản phẩm lặp lại nhiều lần, không có cốt truyện/biến cố).
+3. "Giọng Huế" — từ địa phương (rứa, răng, mô, hắn, chơ, ni...) phải nằm TRONG câu, đúng ngữ pháp & nghĩa. Phạt nếu nhồi từ địa phương vào cuối câu cho có, hoặc vô nghĩa.
+4. "Giác quan" — đoạn tả món ăn phải CỤ THỂ theo công thức: âm thanh → kết cấu → vị (chua→ngọt→cay) → phản ứng cơ thể. Phạt mô tả generic kiểu "giòn giòn", "ngon lắm".
+5. "Con số thật" — BẮT BUỘC có ít nhất 1 con số thật ở cảnh reveal/cao trào (vd "1 tối bán 200 ly", "gọt 10kg trái cây") để tăng sức nặng & độ tin. Thiếu số là trừ điểm mạnh.
+6. "Chêm thương hiệu" — cụm thương hiệu chỉ nên chêm tối đa 1–2 lần, lồng tự nhiên vào thoại nhân vật. Phạt nếu nhồi keyword thành câu rời rạc.
+7. "CTA & cliffhanger" — có lời kêu gọi hợp loại video; với series "Nhớ" cần cliffhanger dẫn sang tập sau.
+8. "Độ dài & nhịp gọn" — nhịp gọn, cắt cảnh chuyển tiếp/filler thừa. Quá dài lan man thì trừ.
+
+"overall" = điểm tổng trên thang 10 (1 chữ số thập phân), phản ánh tổng thể chứ không phải trung bình cộng máy móc.
+"tot" = các điểm mạnh. "can_cai_thien" = điểm yếu cụ thể (kèm ví dụ trong kịch bản). "ap_dung_lan_sau" = 2–4 gợi ý hành động cụ thể cho lần viết sau.
+Mỗi mảng 2–5 mục ngắn. Trả về DUY NHẤT JSON đúng schema, không thêm chữ nào ngoài JSON.`;
+
+function getGeminiKey() { try { return localStorage.getItem(GEMINI_KEY_LS) || ''; } catch { return ''; } }
+
+function buildScriptText() {
+  const p = proj();
+  const groups = groupByScene(p.rows);
+  let words = 0;
+  p.rows.forEach(r => { if (r.type === 'row' || r.type === 'sub') { const t = (r.thoai || '').trim(); if (t) words += t.split(/\s+/).length; } });
+  const lines = [];
+  lines.push('TIÊU ĐỀ: ' + (p.title || '(chưa đặt)'));
+  if (words) lines.push(`Tổng: ~${formatDuration(Math.round(words / WORDS_PER_MIN * 60))} đọc thoại · ${words} từ`);
+  lines.push('');
+  groups.forEach(g => {
+    if (g.type === 'section') { lines.push('## ' + (g.row.label || '').toUpperCase()); return; }
+    const r = g.main;
+    lines.push(`${r.stt || '·'}. ${(r.thoai || '').trim() || '(chưa có thoại)'}`);
+    g.subs.forEach(s => { const t = (s.thoai || '').trim(); if (t) lines.push('   ↳ ' + t); });
+    const meta = [];
+    if (r.ghichu)   meta.push('ghi chú: ' + r.ghichu);
+    if (r.hieu_ung) meta.push('hiệu ứng: ' + r.hieu_ung);
+    if (r.nhac)     meta.push('nhạc: ' + r.nhac);
+    if (meta.length) lines.push('   [' + meta.join(' · ') + ']');
+  });
+  if (p.notes && p.notes.length) {
+    const ns = p.notes.filter(n => (n.text || '').trim());
+    if (ns.length) { lines.push(''); lines.push('## ĐỌC KĨ GIÚP EM'); ns.forEach((n, i) => lines.push(`${i + 1}. ${n.text.trim()}`)); }
+  }
+  return { text: lines.join('\n'), words };
+}
+
+function openAiModal() {
+  document.getElementById('ai-proj-name').textContent = proj().title || '';
+  document.getElementById('ai-error').classList.add('hidden');
+  document.getElementById('ai-result').classList.add('hidden');
+  const load = document.getElementById('ai-loading');
+  load.classList.add('hidden'); load.classList.remove('flex');
+  const hasKey = !!getGeminiKey();
+  document.getElementById('ai-key-setup').classList.toggle('hidden', hasKey);
+  document.getElementById('ai-ready').classList.toggle('hidden', !hasKey);
+  document.getElementById('ai-modal').classList.remove('hidden');
+}
+function closeAiModal() { document.getElementById('ai-modal').classList.add('hidden'); }
+
+function saveGeminiKey() {
+  const inp = document.getElementById('ai-key-input');
+  const v = (inp.value || '').trim();
+  if (!v) { showToast('Chưa nhập key', 'err'); return; }
+  try { localStorage.setItem(GEMINI_KEY_LS, v); } catch {}
+  inp.value = '';
+  document.getElementById('ai-key-setup').classList.add('hidden');
+  document.getElementById('ai-ready').classList.remove('hidden');
+  showToast('Đã lưu key Gemini', 'ok');
+}
+function changeGeminiKey() {
+  try { localStorage.removeItem(GEMINI_KEY_LS); } catch {}
+  document.getElementById('ai-result').classList.add('hidden');
+  document.getElementById('ai-error').classList.add('hidden');
+  document.getElementById('ai-ready').classList.add('hidden');
+  document.getElementById('ai-key-setup').classList.remove('hidden');
+}
+
+async function runAiScore() {
+  const { text, words } = buildScriptText();
+  if (!words) { showToast('Chưa có nội dung để chấm', 'err'); return; }
+  const errEl = document.getElementById('ai-error');
+  const resEl = document.getElementById('ai-result');
+  const loadEl = document.getElementById('ai-loading');
+  errEl.classList.add('hidden');
+  resEl.classList.add('hidden');
+  document.getElementById('ai-ready').classList.add('hidden');
+  loadEl.classList.remove('hidden'); loadEl.classList.add('flex');
+  try {
+    const data = await scoreWithGemini(text);
+    renderAiResult(data);
+    resEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message || 'Có lỗi khi chấm điểm.';
+    errEl.classList.remove('hidden');
+    document.getElementById('ai-ready').classList.remove('hidden');
+  } finally {
+    loadEl.classList.add('hidden'); loadEl.classList.remove('flex');
+  }
+}
+
+async function scoreWithGemini(scriptText) {
+  const key = getGeminiKey();
+  if (!key) throw new Error('Chưa có API key Gemini.');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    system_instruction: { parts: [{ text: SCORING_RUBRIC }] },
+    contents: [{ role: 'user', parts: [{ text: 'Chấm kịch bản sau:\n\n' + scriptText }] }],
+    generationConfig: {
+      temperature: 0.4,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'OBJECT',
+        properties: {
+          overall: { type: 'NUMBER' },
+          criteria: { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+            name: { type: 'STRING' }, score: { type: 'NUMBER' }, comment: { type: 'STRING' }
+          }, required: ['name', 'score', 'comment'] } },
+          tot: { type: 'ARRAY', items: { type: 'STRING' } },
+          can_cai_thien: { type: 'ARRAY', items: { type: 'STRING' } },
+          ap_dung_lan_sau: { type: 'ARRAY', items: { type: 'STRING' } }
+        },
+        required: ['overall', 'criteria', 'tot', 'can_cai_thien', 'ap_dung_lan_sau']
+      }
+    }
+  };
+  let r;
+  try {
+    r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  } catch { throw new Error('Lỗi mạng — kiểm tra kết nối Internet.'); }
+  if (!r.ok) {
+    if (r.status === 400 || r.status === 403) throw new Error('API key Gemini không hợp lệ. Bấm "Đổi API key" để nhập lại.');
+    if (r.status === 429) throw new Error('Hết hạn mức free của Gemini lúc này. Thử lại sau ít phút.');
+    if (r.status === 404) throw new Error('Model không khả dụng (đổi GEMINI_MODEL sang gemini-2.0-flash).');
+    throw new Error('Gemini lỗi (' + r.status + '). Thử lại sau.');
+  }
+  const j = await r.json();
+  const txt = (j && j.candidates && j.candidates[0] && j.candidates[0].content
+    && (j.candidates[0].content.parts || []).map(p => p.text || '').join('')) || '';
+  if (!txt) throw new Error('AI không trả về kết quả. Thử lại.');
+  try { return JSON.parse(txt); } catch { throw new Error('Không đọc được kết quả AI. Thử chấm lại.'); }
+}
+
+function aiScoreColor(s) { return s >= 8 ? '#4ade80' : (s >= 6 ? '#facc15' : '#f87171'); }
+
+function renderAiResult(d) {
+  const el = document.getElementById('ai-result');
+  const overall = Math.round((Number(d.overall) || 0) * 10) / 10;
+  const oc = aiScoreColor(overall);
+  const crit = (d.criteria || []).map(c => {
+    const s = Math.max(0, Math.min(10, Number(c.score) || 0));
+    const col = aiScoreColor(s);
+    return `<div class="mb-2.5">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-semibold text-zinc-200">${esc(c.name || '')}</span>
+        <span class="text-xs font-mono" style="color:${col}">${s}/10</span>
+      </div>
+      <div class="ai-bar-track"><div style="height:100%;width:${s * 10}%;background:${col};border-radius:999px"></div></div>
+      ${c.comment ? `<p class="text-[11px] text-zinc-500 mt-1 leading-snug">${esc(c.comment)}</p>` : ''}
+    </div>`;
+  }).join('');
+  const list = (arr, color) => (arr && arr.length)
+    ? arr.map(x => `<li class="flex gap-2 text-xs text-zinc-300 leading-snug mb-1.5"><span style="color:${color}">•</span><span>${esc(x)}</span></li>`).join('')
+    : '<li class="text-xs text-zinc-600">—</li>';
+  el.innerHTML = `
+    <div class="flex items-center gap-4 mb-4 p-3 ai-block">
+      <div class="flex-shrink-0 text-center">
+        <div class="text-4xl font-extrabold leading-none" style="color:${oc}">${overall}</div>
+        <div class="text-[10px] text-zinc-500 mt-1">/ 10</div>
+      </div>
+      <div class="text-xs text-zinc-400 leading-relaxed">Điểm tổng theo phong cách @tracuami. Chi tiết từng tiêu chí và gợi ý cải thiện bên dưới.</div>
+    </div>
+    <div class="mb-4">${crit}</div>
+    <div class="ai-block mb-2.5"><div class="text-xs font-bold text-green-400 mb-2">✅ Tốt</div><ul>${list(d.tot, '#4ade80')}</ul></div>
+    <div class="ai-block mb-2.5"><div class="text-xs font-bold text-yellow-400 mb-2">⚠️ Cần cải thiện</div><ul>${list(d.can_cai_thien, '#facc15')}</ul></div>
+    <div class="ai-block mb-4"><div class="text-xs font-bold text-violet-400 mb-2">🎯 Áp dụng lần sau</div><ul>${list(d.ap_dung_lan_sau, '#a78bfa')}</ul></div>
+    <button onclick="runAiScore()" class="btn-press w-full px-4 py-2.5 text-sm border border-violet-700 text-violet-300 hover:bg-violet-600/10 rounded-xl font-medium transition-all">Chấm lại</button>
+    <div class="text-center mt-2"><button onclick="changeGeminiKey()" class="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">Đổi API key</button></div>
+  `;
 }
 
 // ============================================================
