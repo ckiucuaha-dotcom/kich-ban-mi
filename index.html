@@ -363,6 +363,21 @@ tailwind.config = {
   html.light #ai-modal .text-zinc-400 { color: #57534e !important; }
   html.light #ai-modal .text-zinc-500 { color: #78716c !important; }
 
+  /* Edit-timeline modal */
+  .ed-scene { border: 1px solid #27272a; border-radius: 12px; padding: 11px 12px; background: #18181b; }
+  html.light .ed-scene { background: #fafaf9; border-color: #e7e5e4; }
+  .ed-tc { font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; color: #fbbf24;
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); border-radius: 6px; padding: 1px 7px; }
+  html.light .ed-tc { color: #b45309; background: rgba(245,158,11,0.1); }
+  .ed-row { display: flex; gap: 7px; font-size: 12px; line-height: 1.5; margin-top: 5px; }
+  .ed-row .ed-ic { flex-shrink: 0; width: 15px; text-align: center; }
+  .ed-row .ed-tx { color: #d4d4d8; }
+  html.light .ed-row .ed-tx { color: #44403c; }
+  html.light #edit-modal > div { background: #ffffff; border-color: #e7e5e4; }
+  html.light #edit-modal h3, html.light #edit-modal .text-zinc-100, html.light #edit-modal .text-zinc-200 { color: #1c1917 !important; }
+  html.light #edit-modal p, html.light #edit-modal .text-zinc-400, html.light #edit-modal .text-zinc-500 { color: #78716c !important; }
+  html.light #edit-key-input { background: #f5f5f4; border-color: #d6d3d1; color: #1c1917; }
+
   /* Toast light */
   html.light #toast-inner {
     background: #ffffff;
@@ -741,6 +756,10 @@ tailwind.config = {
             <svg class="w-4 h-4 flex-shrink-0 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
             Chấm điểm AI
           </button>
+          <button onclick="openEditModal();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
+            <svg class="w-4 h-4 flex-shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4l1.5 5M12 4l1.5 5M17 4l1.5 5"/></svg>
+            Timeline Edit
+          </button>
           <div class="h-px bg-zinc-800 my-1"></div>
           <button onclick="printPDF();hdrMoreClose()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors w-full text-left">
             <svg class="w-4 h-4 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -803,6 +822,11 @@ tailwind.config = {
     <button onclick="openAiModal()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-900/50 hover:border-violet-700 rounded-lg transition-all">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
       Chấm AI
+    </button>
+
+    <button onclick="openEditModal()" class="btn-press flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs text-amber-400 hover:text-amber-300 border border-amber-900/50 hover:border-amber-700 rounded-lg transition-all">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4l1.5 5M12 4l1.5 5M17 4l1.5 5"/></svg>
+      Timeline Edit
     </button>
 
     <!-- Right side -->
@@ -1111,6 +1135,53 @@ tailwind.config = {
   </div>
 </div>
 
+<!-- ===== EDIT TIMELINE MODAL ===== -->
+<div id="edit-modal" class="modal-overlay hidden">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-[40rem] max-w-[calc(100vw-32px)] max-h-[90vh] overflow-y-auto shadow-2xl slide-in">
+    <div class="flex items-center gap-2 mb-1">
+      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4l1.5 5M12 4l1.5 5M17 4l1.5 5"/></svg>
+      <h3 class="text-sm font-semibold text-zinc-100">Timeline dựng video</h3>
+      <span id="edit-proj-name" class="text-xs text-zinc-500 truncate"></span>
+      <button onclick="closeEditModal()" class="ml-auto btn-press w-7 h-7 flex items-center justify-center text-zinc-600 hover:text-zinc-300 rounded-lg transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-xs text-zinc-500 mb-4">AI tạo timeline hướng dẫn dựng từng cảnh: góc quay · nhấn mạnh · hiệu ứng/chuyển cảnh · nhạc/SFX · chữ on-screen.</p>
+
+    <!-- Key setup (shared Gemini key) -->
+    <div id="edit-key-setup" class="hidden">
+      <label class="block text-xs font-semibold text-zinc-400 mb-1.5">API key Gemini (miễn phí)</label>
+      <input type="password" id="edit-key-input" placeholder="Dán API key Gemini vào đây..."
+        class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-600 mb-2">
+      <p class="text-[11px] text-zinc-600 mb-3">Lấy key tại <a href="https://aistudio.google.com/apikey" target="_blank" class="text-amber-400 hover:text-amber-300 underline">aistudio.google.com/apikey</a>. Dùng chung với chức năng Chấm AI. Key lưu trong trình duyệt này.</p>
+      <button onclick="saveEditKey()" class="w-full px-4 py-2.5 text-sm bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-all">Lưu key</button>
+    </div>
+
+    <!-- Ready -->
+    <div id="edit-ready" class="hidden">
+      <button onclick="runEditTimeline()" class="btn-press w-full px-4 py-3 text-sm bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4l1.5 5M12 4l1.5 5M17 4l1.5 5"/></svg>
+        Tạo timeline dựng cho kịch bản này
+      </button>
+      <div class="text-center mt-2">
+        <button onclick="changeGeminiKey()" class="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">Đổi API key</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="edit-loading" class="hidden flex-col items-center justify-center py-10 gap-3">
+      <div class="w-7 h-7 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-zinc-400 text-sm">AI đang lên timeline dựng video...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="edit-error" class="hidden mt-3 p-3 rounded-xl border border-red-900/50 bg-red-950/30 text-sm text-red-300"></div>
+
+    <!-- Result -->
+    <div id="edit-result" class="hidden mt-4"></div>
+  </div>
+</div>
+
 <!-- ===== LOADING OVERLAY ===== -->
 <div id="loading-overlay" class="fixed inset-0 z-[500] bg-zinc-950/90 flex flex-col items-center justify-center gap-4 hidden">
   <div class="w-8 h-8 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
@@ -1319,6 +1390,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('ai-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('ai-modal')) closeAiModal();
+  });
+  document.getElementById('edit-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('edit-modal')) closeEditModal();
   });
 
   document.addEventListener('keydown', e => {
@@ -2086,10 +2160,12 @@ function saveGeminiKey() {
 }
 function changeGeminiKey() {
   try { localStorage.removeItem(GEMINI_KEY_LS); } catch {}
-  document.getElementById('ai-result').classList.add('hidden');
-  document.getElementById('ai-error').classList.add('hidden');
-  document.getElementById('ai-ready').classList.add('hidden');
-  document.getElementById('ai-key-setup').classList.remove('hidden');
+  ['ai', 'edit'].forEach(pfx => {
+    document.getElementById(pfx + '-result')?.classList.add('hidden');
+    document.getElementById(pfx + '-error')?.classList.add('hidden');
+    document.getElementById(pfx + '-ready')?.classList.add('hidden');
+    document.getElementById(pfx + '-key-setup')?.classList.remove('hidden');
+  });
 }
 
 async function runAiScore() {
@@ -2115,30 +2191,15 @@ async function runAiScore() {
   }
 }
 
-async function scoreWithGemini(scriptText) {
+// Helper chung: gọi Gemini và trả JSON đã parse theo schema
+async function geminiGenerateJSON(systemText, userText, schema, temperature = 0.5) {
   const key = getGeminiKey();
   if (!key) throw new Error('Chưa có API key Gemini.');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
   const body = {
-    system_instruction: { parts: [{ text: SCORING_RUBRIC }] },
-    contents: [{ role: 'user', parts: [{ text: 'Chấm kịch bản sau:\n\n' + scriptText }] }],
-    generationConfig: {
-      temperature: 0.4,
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: 'OBJECT',
-        properties: {
-          overall: { type: 'NUMBER' },
-          criteria: { type: 'ARRAY', items: { type: 'OBJECT', properties: {
-            name: { type: 'STRING' }, score: { type: 'NUMBER' }, comment: { type: 'STRING' }
-          }, required: ['name', 'score', 'comment'] } },
-          tot: { type: 'ARRAY', items: { type: 'STRING' } },
-          can_cai_thien: { type: 'ARRAY', items: { type: 'STRING' } },
-          ap_dung_lan_sau: { type: 'ARRAY', items: { type: 'STRING' } }
-        },
-        required: ['overall', 'criteria', 'tot', 'can_cai_thien', 'ap_dung_lan_sau']
-      }
-    }
+    system_instruction: { parts: [{ text: systemText }] },
+    contents: [{ role: 'user', parts: [{ text: userText }] }],
+    generationConfig: { temperature, responseMimeType: 'application/json', responseSchema: schema }
   };
   let r;
   try {
@@ -2154,7 +2215,24 @@ async function scoreWithGemini(scriptText) {
   const txt = (j && j.candidates && j.candidates[0] && j.candidates[0].content
     && (j.candidates[0].content.parts || []).map(p => p.text || '').join('')) || '';
   if (!txt) throw new Error('AI không trả về kết quả. Thử lại.');
-  try { return JSON.parse(txt); } catch { throw new Error('Không đọc được kết quả AI. Thử chấm lại.'); }
+  try { return JSON.parse(txt); } catch { throw new Error('Không đọc được kết quả AI. Thử lại.'); }
+}
+
+async function scoreWithGemini(scriptText) {
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      overall: { type: 'NUMBER' },
+      criteria: { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+        name: { type: 'STRING' }, score: { type: 'NUMBER' }, comment: { type: 'STRING' }
+      }, required: ['name', 'score', 'comment'] } },
+      tot: { type: 'ARRAY', items: { type: 'STRING' } },
+      can_cai_thien: { type: 'ARRAY', items: { type: 'STRING' } },
+      ap_dung_lan_sau: { type: 'ARRAY', items: { type: 'STRING' } }
+    },
+    required: ['overall', 'criteria', 'tot', 'can_cai_thien', 'ap_dung_lan_sau']
+  };
+  return geminiGenerateJSON(SCORING_RUBRIC, 'Chấm kịch bản sau:\n\n' + scriptText, schema, 0.4);
 }
 
 function aiScoreColor(s) { return s >= 8 ? '#4ade80' : (s >= 6 ? '#facc15' : '#f87171'); }
@@ -2193,6 +2271,183 @@ function renderAiResult(d) {
     <button onclick="runAiScore()" class="btn-press w-full px-4 py-2.5 text-sm border border-violet-700 text-violet-300 hover:bg-violet-600/10 rounded-xl font-medium transition-all">Chấm lại</button>
     <div class="text-center mt-2"><button onclick="changeGeminiKey()" class="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">Đổi API key</button></div>
   `;
+}
+
+// ============================================================
+// TIMELINE DỰNG VIDEO (Gemini) — hướng dẫn Edit theo từng cảnh
+// ============================================================
+let _lastEditData = null;
+
+const EDIT_RUBRIC = `Bạn là editor (người dựng) video TikTok chuyên nghiệp cho kênh ẩm thực Huế "@tracuami". Từ kịch bản đã chia cảnh (kèm timecode ước lượng), hãy tạo một TIMELINE HƯỚNG DẪN DỰNG VIDEO chi tiết theo TỪNG CẢNH để người dựng làm theo từng bước. Mục tiêu: video ẩm thực Huế bắt trend, giữ chân 3 giây đầu, nhịp nhanh, cảm xúc.
+
+Với MỖI cảnh, hướng dẫn cụ thể, thực dụng (không chung chung):
+- "goc_quay": kiểu khung hình + chuyển động máy phù hợp nội dung cảnh (vd: cận mặt biểu cảm; macro cận món ăn; toàn cảnh quán; POV tay làm; over-shoulder; b-roll; tĩnh / zoom-in / lia ngang / handheld rung nhẹ).
+- "nhan_manh": cách nhấn mạnh đúng nhịp (vd: punch-in zoom vào từ khoá; slow-mo lúc cắn / đổ nước / kéo sợi; freeze-frame; jump-cut nhanh; cắt theo beat nhạc; nhấn vào con số).
+- "hieu_ung": transition & hiệu ứng cụ thể ở đầu/giữa/cuối cảnh (cut thẳng; whip-pan; match-cut; zoom-blur; flash trắng; hiệu ứng chữ pop; rung lắc).
+- "nhac_sfx": nhạc nền theo mood của cảnh + tiếng động (SFX) cần thêm đúng khoảnh khắc (vd tiếng giòn "rắc/tách", "ục", đổ đá lạo xạo, whoosh khi chuyển cảnh, ting khi hiện chữ).
+- "chu_on_screen": chữ/caption hiển thị trên màn hình cho cảnh đó — ngắn, giật (hook text, con số, lời nhấn). Để trống nếu không cần.
+
+"overview": tong_thoi_luong (ước lượng tổng), phong_cach (mô tả phong cách dựng phù hợp nội dung), nhac_nen (gợi ý thể loại/mood nhạc nền & chỗ nên đổi nhạc), luu_y (2–4 lưu ý dựng quan trọng nhất).
+
+Trả về DUY NHẤT JSON đúng schema, tiếng Việt, ngắn gọn dễ thực thi, không thêm chữ nào ngoài JSON.`;
+
+function fmtClock(sec) { const m = Math.floor(sec / 60), s = Math.round(sec % 60); return m + ':' + String(s).padStart(2, '0'); }
+
+function buildEditScriptText() {
+  const p = proj();
+  const groups = groupByScene(p.rows);
+  const lines = [];
+  lines.push('TIÊU ĐỀ: ' + (p.title || '(chưa đặt)'));
+  lines.push('');
+  let sceneCount = 0, cum = 0;
+  groups.forEach(g => {
+    if (g.type === 'section') { lines.push('## DANH MỤC: ' + (g.row.label || '').toUpperCase()); return; }
+    const r = g.main;
+    sceneCount++;
+    let w = 0;
+    [r.thoai, ...g.subs.map(s => s.thoai)].forEach(t => { const x = (t || '').trim(); if (x) w += x.split(/\s+/).length; });
+    const sec = Math.max(1, Math.round(w / WORDS_PER_MIN * 60));
+    const start = cum; cum += sec;
+    lines.push(`Cảnh ${r.stt || sceneCount} (≈ ${fmtClock(start)}–${fmtClock(cum)}):`);
+    lines.push('  Thoại: ' + ((r.thoai || '').trim() || '(không lời — chỉ hình ảnh)'));
+    g.subs.forEach(s => { const t = (s.thoai || '').trim(); if (t) lines.push('  Thoại phụ: ' + t); });
+    const hints = [];
+    if (r.pic)      hints.push('hình/cảnh quay: ' + r.pic);
+    if (r.ghichu)   hints.push('ghi chú: ' + r.ghichu);
+    if (r.hieu_ung) hints.push('hiệu ứng có sẵn: ' + r.hieu_ung);
+    if (r.nhac)     hints.push('nhạc/SFX có sẵn: ' + r.nhac);
+    if (hints.length) lines.push('  [' + hints.join(' · ') + ']');
+  });
+  return { text: lines.join('\n'), sceneCount, totalSec: cum };
+}
+
+function openEditModal() {
+  document.getElementById('edit-proj-name').textContent = proj().title || '';
+  document.getElementById('edit-error').classList.add('hidden');
+  document.getElementById('edit-result').classList.add('hidden');
+  const load = document.getElementById('edit-loading');
+  load.classList.add('hidden'); load.classList.remove('flex');
+  const hasKey = !!getGeminiKey();
+  document.getElementById('edit-key-setup').classList.toggle('hidden', hasKey);
+  document.getElementById('edit-ready').classList.toggle('hidden', !hasKey);
+  document.getElementById('edit-modal').classList.remove('hidden');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+
+function saveEditKey() {
+  const inp = document.getElementById('edit-key-input');
+  const v = (inp.value || '').trim();
+  if (!v) { showToast('Chưa nhập key', 'err'); return; }
+  try { localStorage.setItem(GEMINI_KEY_LS, v); } catch {}
+  inp.value = '';
+  document.getElementById('edit-key-setup').classList.add('hidden');
+  document.getElementById('edit-ready').classList.remove('hidden');
+  showToast('Đã lưu key Gemini', 'ok');
+}
+
+async function runEditTimeline() {
+  const { text, sceneCount } = buildEditScriptText();
+  if (!sceneCount) { showToast('Chưa có cảnh nào để lên timeline', 'err'); return; }
+  const errEl = document.getElementById('edit-error');
+  const resEl = document.getElementById('edit-result');
+  const loadEl = document.getElementById('edit-loading');
+  errEl.classList.add('hidden');
+  resEl.classList.add('hidden');
+  document.getElementById('edit-ready').classList.add('hidden');
+  loadEl.classList.remove('hidden'); loadEl.classList.add('flex');
+  try {
+    const data = await editTimelineWithGemini(text);
+    _lastEditData = data;
+    renderEditResult(data);
+    resEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message || 'Có lỗi khi tạo timeline.';
+    errEl.classList.remove('hidden');
+    document.getElementById('edit-ready').classList.remove('hidden');
+  } finally {
+    loadEl.classList.add('hidden'); loadEl.classList.remove('flex');
+  }
+}
+
+async function editTimelineWithGemini(scriptText) {
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      overview: { type: 'OBJECT', properties: {
+        tong_thoi_luong: { type: 'STRING' }, phong_cach: { type: 'STRING' },
+        nhac_nen: { type: 'STRING' }, luu_y: { type: 'ARRAY', items: { type: 'STRING' } }
+      }, required: ['tong_thoi_luong', 'phong_cach', 'nhac_nen', 'luu_y'] },
+      scenes: { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+        canh: { type: 'STRING' }, timecode: { type: 'STRING' },
+        goc_quay: { type: 'STRING' }, nhan_manh: { type: 'STRING' },
+        hieu_ung: { type: 'STRING' }, nhac_sfx: { type: 'STRING' }, chu_on_screen: { type: 'STRING' }
+      }, required: ['canh', 'timecode', 'goc_quay', 'nhan_manh', 'hieu_ung', 'nhac_sfx', 'chu_on_screen'] } }
+    },
+    required: ['overview', 'scenes']
+  };
+  return geminiGenerateJSON(EDIT_RUBRIC, 'Lên timeline dựng cho kịch bản sau:\n\n' + scriptText, schema, 0.55);
+}
+
+function renderEditResult(d) {
+  const el = document.getElementById('edit-result');
+  const ov = d.overview || {};
+  const row = (ic, label, val) => val ? `<div class="ed-row"><span class="ed-ic">${ic}</span><span class="ed-tx"><b class="text-zinc-500 font-semibold">${label}:</b> ${esc(val)}</span></div>` : '';
+  const scenes = (d.scenes || []).map(s => `
+    <div class="ed-scene mb-2.5">
+      <div class="flex items-center gap-2 mb-0.5">
+        <span class="ed-tc">${esc(s.timecode || '')}</span>
+        <span class="text-xs font-bold text-zinc-100">${esc(s.canh || '')}</span>
+      </div>
+      ${row('🎥', 'Góc quay', s.goc_quay)}
+      ${row('⚡', 'Nhấn mạnh', s.nhan_manh)}
+      ${row('✨', 'Hiệu ứng', s.hieu_ung)}
+      ${row('🎵', 'Nhạc/SFX', s.nhac_sfx)}
+      ${row('🔤', 'Chữ on-screen', s.chu_on_screen)}
+    </div>`).join('');
+  const luuy = (ov.luu_y && ov.luu_y.length)
+    ? '<ul class="mt-1.5">' + ov.luu_y.map(x => `<li class="flex gap-2 text-xs text-zinc-300 leading-snug mb-1"><span class="text-amber-400">•</span><span>${esc(x)}</span></li>`).join('') + '</ul>'
+    : '';
+  el.innerHTML = `
+    <div class="ai-block mb-3">
+      <div class="text-xs font-bold text-amber-400 mb-1.5">🎬 Tổng quan dựng</div>
+      ${ov.tong_thoi_luong ? `<p class="text-xs text-zinc-300 mb-1"><b class="text-zinc-500">Thời lượng:</b> ${esc(ov.tong_thoi_luong)}</p>` : ''}
+      ${ov.phong_cach ? `<p class="text-xs text-zinc-300 mb-1"><b class="text-zinc-500">Phong cách:</b> ${esc(ov.phong_cach)}</p>` : ''}
+      ${ov.nhac_nen ? `<p class="text-xs text-zinc-300 mb-1"><b class="text-zinc-500">Nhạc nền:</b> ${esc(ov.nhac_nen)}</p>` : ''}
+      ${luuy}
+    </div>
+    <div class="mb-3">${scenes}</div>
+    <div class="flex gap-2">
+      <button onclick="copyEditTimeline()" class="btn-press flex-1 px-4 py-2.5 text-sm border border-amber-700 text-amber-300 hover:bg-amber-600/10 rounded-xl font-medium transition-all">Sao chép timeline</button>
+      <button onclick="runEditTimeline()" class="btn-press flex-1 px-4 py-2.5 text-sm border border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-xl font-medium transition-all">Tạo lại</button>
+    </div>`;
+}
+
+function copyEditTimeline() {
+  const d = _lastEditData;
+  if (!d) return;
+  const ov = d.overview || {};
+  const L = [];
+  L.push('TIMELINE DỰNG — ' + (proj().title || ''));
+  if (ov.tong_thoi_luong) L.push('Thời lượng: ' + ov.tong_thoi_luong);
+  if (ov.phong_cach)      L.push('Phong cách: ' + ov.phong_cach);
+  if (ov.nhac_nen)        L.push('Nhạc nền: ' + ov.nhac_nen);
+  (ov.luu_y || []).forEach(x => L.push('- ' + x));
+  L.push('');
+  (d.scenes || []).forEach(s => {
+    L.push(`[${s.timecode || ''}] ${s.canh || ''}`);
+    if (s.goc_quay)      L.push('  Góc quay: ' + s.goc_quay);
+    if (s.nhan_manh)     L.push('  Nhấn mạnh: ' + s.nhan_manh);
+    if (s.hieu_ung)      L.push('  Hiệu ứng: ' + s.hieu_ung);
+    if (s.nhac_sfx)      L.push('  Nhạc/SFX: ' + s.nhac_sfx);
+    if (s.chu_on_screen) L.push('  Chữ: ' + s.chu_on_screen);
+    L.push('');
+  });
+  const txt = L.join('\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(() => showToast('Đã sao chép timeline', 'ok')).catch(() => showToast('Không sao chép được', 'err'));
+  } else {
+    showToast('Trình duyệt không hỗ trợ sao chép', 'err');
+  }
 }
 
 // ============================================================
